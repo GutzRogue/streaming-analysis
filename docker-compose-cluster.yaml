@@ -1,0 +1,105 @@
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    environment:
+      - CLUSTER_NAME=streaming-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_blocksize=65536
+    volumes:
+      - namenode_cluster_data:/hadoop/dfs/name
+    networks:
+      - bigdata-cluster-net
+    cpus: "1.0"
+    mem_limit: 1g
+
+  datanode1:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode1
+    hostname: datanode1
+    depends_on:
+      - namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_blocksize=65536
+      - SERVICE_PRECONDITION=namenode:9870
+    volumes:
+      - datanode1_cluster_data:/hadoop/dfs/data
+    networks:
+      - bigdata-cluster-net
+    cpus: "0.75"
+    mem_limit: 768m
+
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
+    hostname: datanode2
+    depends_on:
+      - namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_blocksize=65536
+      - SERVICE_PRECONDITION=namenode:9870
+    volumes:
+      - datanode2_cluster_data:/hadoop/dfs/data
+    networks:
+      - bigdata-cluster-net
+    cpus: "0.75"
+    mem_limit: 768m
+
+  datanode3:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode3
+    hostname: datanode3
+    depends_on:
+      - namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_blocksize=65536
+      - SERVICE_PRECONDITION=namenode:9870
+    volumes:
+      - datanode3_cluster_data:/hadoop/dfs/data
+    networks:
+      - bigdata-cluster-net
+    cpus: "0.75"
+    mem_limit: 768m
+
+  spark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-notebook
+    hostname: spark-notebook
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+    networks:
+      - bigdata-cluster-net
+    cpus: "2.0"
+    mem_limit: 3g
+
+networks:
+  bigdata-cluster-net:
+
+volumes:
+  namenode_cluster_data:
+  datanode1_cluster_data:
+  datanode2_cluster_data:
+  datanode3_cluster_data:

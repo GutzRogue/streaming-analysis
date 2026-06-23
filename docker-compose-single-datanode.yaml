@@ -1,0 +1,60 @@
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    environment:
+      - CLUSTER_NAME=streaming-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+    volumes:
+      - namenode_data:/hadoop/dfs/name
+    networks:
+      - bigdata-net
+    cpus: "1.0"
+    mem_limit: 1g
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    hostname: datanode
+    depends_on:
+      - namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - SERVICE_PRECONDITION=namenode:9870
+    volumes:
+      - datanode_data:/hadoop/dfs/data
+    networks:
+      - bigdata-net
+    cpus: "1.0"
+    mem_limit: 1g
+
+  spark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-notebook
+    hostname: spark-notebook
+    depends_on:
+      - namenode
+      - datanode
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+    networks:
+      - bigdata-net
+    cpus: "2.0"
+    mem_limit: 3g
+
+networks:
+  bigdata-net:
+
+volumes:
+  namenode_data:
+  datanode_data:
