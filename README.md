@@ -1,13 +1,5 @@
 # **Projet Big Data : Analyse des abonnés d’une plateforme de streaming avec Hadoop HDFS et Apache Spark** 
 
-## **Informations étudiant** 
-
-- **Nom :** Zakaria 
-
-- **Prénom :** Bayad 
-
-- **Projet :** Analyse des abonnés d’une plateforme de streaming 
-
 ## **1. Introduction** 
 
 L’objectif de ce projet est de mettre en œuvre une architecture Big Data basée sur **Hadoop HDFS** et **Apache Spark** afin d’analyser les données des abonnés d’une plateforme de streaming. 
